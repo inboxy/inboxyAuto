@@ -1,0 +1,34 @@
+{
+  "name": "sensor-data-recorder",
+  "version": "1.0.0",
+  "description": "A Progressive Web App for recording GPS, accelerometer, and gyroscope sensor data",
+  "main": "index.html",
+  "scripts": {
+    "start": "python -m http.server 8000",
+    "serve": "npx http-server -p 8000 -o",
+    "deploy": "gh-pages -d ."
+  },
+  "keywords": [
+    "pwa",
+    "sensors",
+    "gps",
+    "accelerometer",
+    "gyroscope",
+    "mobile",
+    "data-logging"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/sensor-data-recorder.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/sensor-data-recorder/issues"
+  },
+  "homepage": "https://yourusername.github.io/sensor-data-recorder/",
+  "devDependencies": {
+    "http-server": "^14.1.1",
+    "gh-pages": "^6.0.0"
+  }
+}
