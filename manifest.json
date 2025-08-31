@@ -2,7 +2,7 @@
   "name": "Sensor Data Recorder",
   "short_name": "inboxyAuto",
   "description": "Advanced GPS, Accelerometer & Gyroscope Data Logger",
-  "start_url": "https://inboxy.github.io/inboxyAuto/",
+  "start_url": "https://inboxy.github.io/inboxyAuto/index.html",
   "display": "standalone",
   "background_color": "#667eea",
   "theme_color": "#667eea",
