@@ -324,17 +324,12 @@
                     });
                 `;
                 
-                const blob = new Blob([swCode], { type: 'application/javascript' });
-                const swUrl = URL.createObjectURL(blob);
-                
-                navigator.serviceWorker.register(swUrl)
-                    .then(registration => {
-                        console.log('ServiceWorker registered:', registration);
-                    })
-                    .catch(error => {
-                        console.log('ServiceWorker registration failed:', error);
-                    });
-            }
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js')
+    .then(reg => console.log('Service Worker registered:', reg))
+    .catch(err => console.error('Service Worker registration failed:', err));
+}
 
             // Handle beforeinstallprompt event
             window.addEventListener('beforeinstallprompt', (e) => {
