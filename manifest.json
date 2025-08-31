@@ -1,0 +1,21 @@
+{
+  "name": "Sensor Data Recorder",
+  "short_name": "Sensors",
+  "description": "Advanced GPS, Accelerometer & Gyroscope Data Logger",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#667eea",
+  "theme_color": "#667eea",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgdmlld0JveD0iMCAwIDEyOCAxMjgiIGZpbGw9IiM2NjdlZWEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNjQiIGN5PSI2NCIgcj0iNTAiIGZpbGw9IiNmYTkzZmIiLz48cGF0aCBkPSJtMjkgMTYgbC0xNCAxN2MtMiA5LWUgMXEtMCAxQzE3IDE1IDE2IDE2YTAgMCExIDE0IDAhMTQtMTQgMTdjLTkgMi0xNiA3LTUuNS0wLjFsLTEyLjUtMTljLTEuNC0yIC4xLTQuOCAyLjItNi4xYTAgMCAwIDE4MS0yIDMzYzEtNS43IDEtMTAgMC0xMCAwIDEgMS1hMTEuOCAwIDAgMCAwLTEuOS02LjI0LTMuNC0xMi40LTIuNU02Ni45IDM4bC0yLjFjMS0zLjktNDN6LjItNzBsLTE0IDE3QzEyIDEyLjktNS41IC4xbC03LjctOE4uaWwiIGZpbGw9IiNyT1I3NSIvPjwvc3ZnPg==",
+      "sizes": "128x128",
+      "type": "image/svg+xml"
+    }
+  ],
+  "categories": ["utilities", "productivity"],
+  "lang": "en",
+  "prefer_related_applications": false
+}
