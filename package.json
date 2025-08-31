@@ -4,9 +4,6 @@
   "description": "A Progressive Web App for recording GPS, accelerometer, and gyroscope sensor data",
   "main": "index.html",
   "scripts": {
-    "start": "python -m http.server 8000",
-    "serve": "npx http-server -p 8000 -o",
-    "deploy": "gh-pages -d ."
   },
   "keywords": [
     "pwa",
