@@ -6,24 +6,17 @@
   "scripts": {
   },
   "keywords": [
-    "pwa",
-    "sensors",
-    "gps",
-    "accelerometer",
-    "gyroscope",
-    "mobile",
-    "data-logging"
   ],
   "author": "Your Name",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/sensor-data-recorder.git"
+    "url": "https://github.com/inboxy/inboxyAuto.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/sensor-data-recorder/issues"
+    "url": "https://github.com/inboxy/inboxyAuto/issues"
   },
-  "homepage": "https://yourusername.github.io/sensor-data-recorder/",
+  "homepage": "https://www.inboxy.net/",
   "devDependencies": {
     "http-server": "^14.1.1",
     "gh-pages": "^6.0.0"
