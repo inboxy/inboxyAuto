@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Sensor Recorder">
+    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIlNlbnNvciBEYXRhIFJlY29yZGVyIiwKICAic2hvcnRfbmFtZSI6ICJTZW5zb3JzIiwKICAiZGVzY3JpcHRpb24iOiAiQWR2YW5jZWQgR1BTLCBBY2NlbGVyb21ldGVyICYgR3lyb3Njb3BlIERhdGEgTG9nZ2VyIiwKICAic3RhcnRfdXJsIjogIi8iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiM2NjdlZWEiLAogICJ0aGVtZV9jb2xvciI6ICIjNjY3ZWVhIiwKICAiaWNvbnMiOiBbCiAgICB7CiAgICAgICJzcmMiOiAiZGF0YTppbWFnZS9zdmcreG1sO2Jhc2U2NCxQSE4yWnlCM2FXUjBhRDBpTVRJNElpQm9aV2xuYUhROUlqRXlPQ0lpSUhacFpYZENiM2c5SWpBZ01DQXhNamdnTVRJNElpQm1hV3hzUFNJak5qWTNaV1ZoSWlCNGJXeHVjejBpYUhSMGNEb3ZMM2QzZHk1M015NXZjbWN2TWpBd01DOXpkbWNpUGp4amFYSmpiR1VnWTNnOUlqWTBJaUJqZVQwaU5qUWlJSEk5SWpVd0lpQm1hV3hzUFNJalptQTVNMlppSWk4K1BIQmhkR2dnWkQwaWJUSTVJREUySUd3dE1UUWdNVGRqTFRJZ09TMWxJREVxTFRBZ01VTXhOeUF4TlNBeE5pQXhObUV3SURBaE1TQXhOQ0F3TVRRdE1UUWdNVGRqTFRrZ01pMHhOaUEzTFRVdU5TMHdMakZzTFRFeUxqVXRNVGxqTFRFdU5DMHlJQzR4TFRRdU9DQXlMakl0TmlBeElHRXdJREFnTVRneExUSWdNek5qTVMwMUxqY2dNUzB4TUFBeE1DMHhNQ0F3SURFZ01TMWhNVEV1T0NBd0lEQWdNQ0F3TFRFdU9TMDJMakkwTFRNdU5DMHhNaTQwTFRJdU5VMDJOaTQ1SURNNGJDMHlMakZqTVMwekxqa3ROQTB6TGpJdE56QnNMVEUwSURFM1F6RTFJREV5TGprdE5TNDFJQzR4YkMwM0xqY3RPRTR1SWw4aUlHWnBiR3c5SWlOeVQxSTNOU0l2UGp3dmMzWm5QZz09IiwKICAgICAgInNpemVzIjogIjEyOHgxMjgiLAogICAgICAidHlwZSI6ICJpbWFnZS9zdmcreG1sIgogICAgfQogIF0sCiAgImNhdGVnb3JpZXMiOiBbInV0aWxpdGllcyIsICJwcm9kdWN0aXZpdHkiXSwKICAibGFuZyI6ICJlbiIKfQ==">
+    <title>Sensor Data Recorder</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            color: white;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .status-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            border-left: 5px solid #667eea;
+        }
+
+        .status-card h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .status-item:last-child {
+            border-bottom: none;
+        }
+
+        .status-label {
+            font-weight: 500;
+            color: #555;
+        }
+
+        .status-value {
+            font-weight: 600;
+            color: #333;
+            font-family: 'Courier New', monospace;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(245, 87, 108, 0.3);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .btn-success:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(79, 172, 254, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .sensor-data {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .gyro-card {
+            border-left-color: #f093fb;
+        }
+
+        .recording-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #ff4757;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            animation: pulse 1.5s infinite;
+            display: none;
+            z-index: 1000;
+        }
+
+        .recording-indicator.active {
+            display: block;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .permission-status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .granted {
+            background: #2ed573;
+            color: white;
+        }
+
+        .denied {
+            background: #ff4757;
+            color: white;
+        }
+
+        .requesting {
+            background: #ffa502;
+            color: white;
+        }
+
+        .error-message {
+            background: #ff4757;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .install-section {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 15px;
+            border: 2px dashed #667eea;
+        }
+
+        .install-section.hidden {
+            display: none;
+        }
+
+        .btn-install {
+            background: linear-gradient(135deg, #2ed573 0%, #17a2b8 100%);
+            color: white;
+            margin-top: 10px;
+        }
+
+        .btn-install:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(46, 213, 115, 0.3);
+        }
+
+        .install-text {
+            font-size: 0.9em;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                padding: 20px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+
+        // PWA Setup and Installation
+        function setupPWA() {
+            // Register service worker
+            if ('serviceWorker' in navigator) {
+                const swCode = `
+                    const CACHE_NAME = 'sensor-recorder-v1';
+                    const urlsToCache = ['/'];
+                    
+                    self.addEventListener('install', event => {
+                        event.waitUntil(
+                            caches.open(CACHE_NAME)
+                                .then(cache => cache.addAll(urlsToCache))
+                        );
+                    });
+                    
+                    self.addEventListener('fetch', event => {
+                        event.respondWith(
+                            caches.match(event.request)
+                                .then(response => {
+                                    if (response) {
+                                        return response;
+                                    }
+                                    return fetch(event.request);
+                                })
+                        );
+                    });
+                `;
+                
+                const blob = new Blob([swCode], { type: 'application/javascript' });
+                const swUrl = URL.createObjectURL(blob);
+                
+                navigator.serviceWorker.register(swUrl)
+                    .then(registration => {
+                        console.log('ServiceWorker registered:', registration);
+                    })
+                    .catch(error => {
+                        console.log('ServiceWorker registration failed:', error);
+                    });
+            }
+
+            // Handle beforeinstallprompt event
+            window.addEventListener('beforeinstallprompt', (e) => {
+                console.log('beforeinstallprompt event fired');
+                e.preventDefault();
+                deferredPrompt = e;
+                isInstallable = true;
+                showInstallOption();
+            });
+
+            // Handle app installed event
+            window.addEventListener('appinstalled', (evt) => {
+                console.log('App installed successfully');
+                hideInstallOption();
+                showError('App installed successfully! 🎉', true);
+            });
+
+            // Check if already installed (standalone mode)
+            if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
+                console.log('App is running in standalone mode');
+                hideInstallOption();
+            }
+
+            // For iOS Safari - show install instructions
+            if (isIOSSafari()) {
+                showIOSInstallInstructions();
+            }
+        }
+
+        function isIOSSafari() {
+            const userAgent = window.navigator.userAgent.toLowerCase();
+            const isIOS = /ipad|iphone|ipod/.test(userAgent);
+            const isSafari = /safari/.test(userAgent) && !/chrome|crios|fxios/.test(userAgent);
+            return isIOS && isSafari;
+        }
+
+        function showInstallOption() {
+            const installSection = document.getElementById('installSection');
+            if (installSection) {
+                installSection.classList.remove('hidden');
+            }
+        }
+
+        function hideInstallOption() {
+            const installSection = document.getElementById('installSection');
+            if (installSection) {
+                installSection.classList.add('hidden');
+            }
+        }
+
+        function showIOSInstallInstructions() {
+            const installSection = document.getElementById('installSection');
+            const installText = installSection.querySelector('.install-text');
+            const installBtn = document.getElementById('installBtn');
+            
+            if (installText && installBtn) {
+                installText.innerHTML = '📱 To install: Tap <strong>Share</strong> → <strong>Add to Home Screen</strong>';
+                installBtn.style.display = 'none';
+                installSection.classList.remove('hidden');
+            }
+        }
+
+        async function installApp() {
+            if (!deferredPrompt) {
+                // Fallback for browsers that don't support PWA installation
+                if (isIOSSafari()) {
+                    showError('Tap the Share button and select "Add to Home Screen"', true);
+                } else {
+                    showError('Installation not available in this browser', true);
+                }
+                return;
+            }
+
+            try {
+                // Show the installation prompt
+                deferredPrompt.prompt();
+                
+                // Wait for the user to respond
+                const { outcome } = await deferredPrompt.userChoice;
+                
+                console.log('User choice:', outcome);
+                
+                if (outcome === 'accepted') {
+                    console.log('User accepted the install prompt');
+                    showError('Installing app... 📱', true);
+                } else {
+                    console.log('User dismissed the install prompt');
+                }
+                
+                // Clear the saved prompt
+                deferredPrompt = null;
+                isInstallable = false;
+                hideInstallOption();
+                
+            } catch (error) {
+                console.error('Installation failed:', error);
+                showError('Installation failed. Please try again.', true);
+            }
+    </style>
+</head>
+<body>
+    <div class="recording-indicator" id="recordingIndicator">
+        🔴 RECORDING
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>📱 Sensor Recorder</h1>
+            <p>Advanced GPS, Accelerometer & Gyroscope Data Logger</p>
+        </div>
+
+        <div id="errorMessage" class="error-message">
+            <span id="errorText"></span>
+        </div>
+
+        <div id="installSection" class="install-section hidden">
+            <div class="install-text">📱 Save this app to your home screen for easy access!</div>
+            <button class="btn btn-install" id="installBtn" onclick="installApp()">Add to Home Screen</button>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="recordCount">0</div>
+                <div class="stat-label">Records</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="duration">00:00</div>
+                <div class="stat-label">Duration</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="frequency">0.0</div>
+                <div class="stat-label">Hz</div>
+            </div>
+        </div>
+
+        <div class="status-grid">
+            <div class="status-card">
+                <h3>🌐 Sensor Status</h3>
+                <div class="status-item">
+                    <span class="status-label">GPS</span>
+                    <span class="permission-status requesting" id="gpsStatus">Checking...</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Motion</span>
+                    <span class="permission-status requesting" id="motionStatus">Checking...</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Gyroscope</span>
+                    <span class="permission-status requesting" id="gyroStatus">Checking...</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Recording</span>
+                    <span class="status-value" id="recordingStatus">Stopped</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-primary" id="startBtn" onclick="startRecording()">Start Recording</button>
+            <button class="btn btn-secondary" id="stopBtn" onclick="stopRecording()" disabled>Stop Recording</button>
+            <button class="btn btn-success" id="downloadBtn" onclick="downloadData()" disabled>Download Data</button>
+        </div>
+
+        <div class="sensor-data">
+            <div class="status-card">
+                <h3>📍 GPS Data</h3>
+                <div class="status-item">
+                    <span class="status-label">Latitude:</span>
+                    <span class="status-value" id="latitude">--</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Longitude:</span>
+                    <span class="status-value" id="longitude">--</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Accuracy:</span>
+                    <span class="status-value" id="accuracy">--</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Timestamp:</span>
+                    <span class="status-value" id="gpsTimestamp">--</span>
+                </div>
+            </div>
+
+            <div class="status-card">
+                <h3>📱 Accelerometer Data</h3>
+                <div class="status-item">
+                    <span class="status-label">X-Axis:</span>
+                    <span class="status-value" id="accelX">--</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Y-Axis:</span>
+                    <span class="status-value" id="accelY">--</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Z-Axis:</span>
+                    <span class="status-value" id="accelZ">--</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Last Update:</span>
+                    <span class="status-value" id="accelTimestamp">--</span>
+                </div>
+            </div>
+
+            <div class="status-card gyro-card">
+                <h3>🌀 Gyroscope Data</h3>
+                <div class="status-item">
+                    <span class="status-label">Alpha (Z):</span>
+                    <span class="status-value" id="gyroAlpha">--</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Beta (X):</span>
+                    <span class="status-value" id="gyroBeta">--</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Gamma (Y):</span>
+                    <span class="status-value" id="gyroGamma">--</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Last Update:</span>
+                    <span class="status-value" id="gyroTimestamp">--</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isRecording = false;
+        let recordedData = [];
+        let recordingStartTime = null;
+        let recordingInterval = null;
+        let durationInterval = null;
+        let gpsWatchId = null;
+        let hasGPS = false;
+        let hasMotion = false;
+        let hasGyro = false;
+
+        // PWA installation variables
+        let deferredPrompt;
+        let isInstallable = false;
+
+        // Current sensor values
+        let currentData = {
+            gps: { latitude: null, longitude: null, accuracy: null, timestamp: null },
+            accelerometer: { x: null, y: null, z: null, timestamp: null },
+            gyroscope: { alpha: null, beta: null, gamma: null, timestamp: null }
+        };
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+            setupPWA();
+        });
+
+        async function initializeApp() {
+            try {
+                showError('Checking sensor permissions...', false);
+                await checkPermissions();
+                setupEventListeners();
+                hideError();
+            } catch (error) {
+                showError('Failed to initialize sensors: ' + error.message);
+            }
+        }
+
+        async function checkPermissions() {
+            // Check GPS
+            if ('geolocation' in navigator) {
+                try {
+                    await new Promise((resolve, reject) => {
+                        navigator.geolocation.getCurrentPosition(
+                            (position) => {
+                                hasGPS = true;
+                                updateStatus('gpsStatus', 'granted');
+                                resolve(position);
+                            },
+                            (error) => {
+                                updateStatus('gpsStatus', 'denied');
+                                console.warn('GPS access denied:', error.message);
+                                resolve(); // Don't reject, just continue without GPS
+                            },
+                            { timeout: 10000, maximumAge: 60000 }
+                        );
+                    });
+                } catch (error) {
+                    updateStatus('gpsStatus', 'denied');
+                }
+            } else {
+                updateStatus('gpsStatus', 'denied');
+            }
+
+            // Check Motion (Accelerometer)
+            if ('DeviceMotionEvent' in window) {
+                if (typeof DeviceMotionEvent.requestPermission === 'function') {
+                    // iOS 13+ permission request
+                    try {
+                        const permission = await DeviceMotionEvent.requestPermission();
+                        if (permission === 'granted') {
+                            hasMotion = true;
+                            updateStatus('motionStatus', 'granted');
+                        } else {
+                            updateStatus('motionStatus', 'denied');
+                        }
+                    } catch (error) {
+                        updateStatus('motionStatus', 'denied');
+                        console.warn('Motion permission error:', error);
+                    }
+                } else {
+                    // Non-iOS or older iOS
+                    hasMotion = true;
+                    updateStatus('motionStatus', 'granted');
+                }
+            } else {
+                updateStatus('motionStatus', 'denied');
+            }
+
+            // Check Gyroscope (DeviceOrientationEvent)
+            if ('DeviceOrientationEvent' in window) {
+                if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+                    // iOS 13+ permission request
+                    try {
+                        const permission = await DeviceOrientationEvent.requestPermission();
+                        if (permission === 'granted') {
+                            hasGyro = true;
+                            updateStatus('gyroStatus', 'granted');
+                        } else {
+                            updateStatus('gyroStatus', 'denied');
+                        }
+                    } catch (error) {
+                        updateStatus('gyroStatus', 'denied');
+                        console.warn('Gyroscope permission error:', error);
+                    }
+                } else {
+                    // Non-iOS or older iOS
+                    hasGyro = true;
+                    updateStatus('gyroStatus', 'granted');
+                }
+            } else {
+                updateStatus('gyroStatus', 'denied');
+            }
+        }
+
+        function setupEventListeners() {
+            // GPS tracking
+            if (hasGPS) {
+                const options = {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 5000
+                };
+
+                gpsWatchId = navigator.geolocation.watchPosition(
+                    handleGPSUpdate,
+                    handleGPSError,
+                    options
+                );
+            }
+
+            // Accelerometer
+            if (hasMotion) {
+                window.addEventListener('devicemotion', handleMotionUpdate);
+            }
+
+            // Gyroscope
+            if (hasGyro) {
+                window.addEventListener('deviceorientation', handleOrientationUpdate);
+            }
+        }
+
+        function handleGPSUpdate(position) {
+            const now = new Date();
+            currentData.gps = {
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude,
+                accuracy: position.coords.accuracy,
+                timestamp: now.toISOString()
+            };
+
+            updateDisplay('latitude', position.coords.latitude.toFixed(6));
+            updateDisplay('longitude', position.coords.longitude.toFixed(6));
+            updateDisplay('accuracy', position.coords.accuracy.toFixed(1) + 'm');
+            updateDisplay('gpsTimestamp', now.toLocaleTimeString());
+        }
+
+        function handleGPSError(error) {
+            console.warn('GPS Error:', error.message);
+            // Don't show error for every GPS failure, just log it
+        }
+
+        function handleMotionUpdate(event) {
+            if (event.accelerationIncludingGravity) {
+                const now = new Date();
+                currentData.accelerometer = {
+                    x: event.accelerationIncludingGravity.x || 0,
+                    y: event.accelerationIncludingGravity.y || 0,
+                    z: event.accelerationIncludingGravity.z || 0,
+                    timestamp: now.toISOString()
+                };
+
+                updateDisplay('accelX', (event.accelerationIncludingGravity.x || 0).toFixed(2));
+                updateDisplay('accelY', (event.accelerationIncludingGravity.y || 0).toFixed(2));
+                updateDisplay('accelZ', (event.accelerationIncludingGravity.z || 0).toFixed(2));
+                updateDisplay('accelTimestamp', now.toLocaleTimeString());
+            }
+        }
+
+        function handleOrientationUpdate(event) {
+            const now = new Date();
+            currentData.gyroscope = {
+                alpha: event.alpha || 0,  // Z-axis rotation (0-360°)
+                beta: event.beta || 0,    // X-axis rotation (-180 to 180°)
+                gamma: event.gamma || 0,  // Y-axis rotation (-90 to 90°)
+                timestamp: now.toISOString()
+            };
+
+            updateDisplay('gyroAlpha', (event.alpha || 0).toFixed(1) + '°');
+            updateDisplay('gyroBeta', (event.beta || 0).toFixed(1) + '°');
+            updateDisplay('gyroGamma', (event.gamma || 0).toFixed(1) + '°');
+            updateDisplay('gyroTimestamp', now.toLocaleTimeString());
+        }
+
+        function startRecording() {
+            if (isRecording) return;
+
+            if (!hasGPS && !hasMotion && !hasGyro) {
+                showError('No sensors available for recording. Please grant permissions and try again.');
+                return;
+            }
+
+            isRecording = true;
+            recordedData = [];
+            recordingStartTime = Date.now();
+
+            // Update UI
+            document.getElementById('startBtn').disabled = true;
+            document.getElementById('stopBtn').disabled = false;
+            document.getElementById('downloadBtn').disabled = true;
+            document.getElementById('recordingStatus').textContent = 'Recording';
+            document.getElementById('recordingIndicator').classList.add('active');
+
+            // Start recording interval (10Hz = 100ms intervals)
+            recordingInterval = setInterval(recordDataPoint, 100);
+
+            // Start duration timer
+            durationInterval = setInterval(() => {
+                if (!isRecording) {
+                    clearInterval(durationInterval);
+                    durationInterval = null;
+                    return;
+                }
+                updateDuration();
+                updateFrequency();
+            }, 100);
+
+            hideError();
+            console.log('Recording started');
+        }
+
+        function stopRecording() {
+            if (!isRecording) return;
+
+            isRecording = false;
+
+            // Clear intervals
+            if (recordingInterval) {
+                clearInterval(recordingInterval);
+                recordingInterval = null;
+            }
+            
+            if (durationInterval) {
+                clearInterval(durationInterval);
+                durationInterval = null;
+            }
+
+            // Update UI
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('stopBtn').disabled = true;
+            document.getElementById('downloadBtn').disabled = recordedData.length === 0;
+            document.getElementById('recordingStatus').textContent = 'Stopped';
+            document.getElementById('recordingIndicator').classList.remove('active');
+
+            console.log('Recording stopped. Total records:', recordedData.length);
+        }
+
+        function recordDataPoint() {
+            if (!isRecording) return;
+
+            const now = new Date();
+            const dataPoint = {
+                timestamp: now.toISOString(),
+                recordingTime: Date.now() - recordingStartTime,
+                gps: { ...currentData.gps },
+                accelerometer: { ...currentData.accelerometer },
+                gyroscope: { ...currentData.gyroscope }
+            };
+
+            recordedData.push(dataPoint);
+            updateDisplay('recordCount', recordedData.length);
+        }
+
+        function updateDuration() {
+            if (!isRecording || !recordingStartTime) return;
+
+            const elapsed = Date.now() - recordingStartTime;
+            const minutes = Math.floor(elapsed / 60000);
+            const seconds = Math.floor((elapsed % 60000) / 1000);
+
+            updateDisplay('duration', 
+                String(minutes).padStart(2, '0') + ':' + 
+                String(seconds).padStart(2, '0')
+            );
+        }
+
+        function updateFrequency() {
+            if (!isRecording || recordedData.length < 2) {
+                updateDisplay('frequency', '0.0');
+                return;
+            }
+
+            const elapsed = Date.now() - recordingStartTime;
+            const frequency = (recordedData.length / elapsed) * 1000;
+            updateDisplay('frequency', frequency.toFixed(1));
+        }
+
+        function downloadData() {
+            if (recordedData.length === 0) {
+                showError('No data to download. Please record some data first.');
+                return;
+            }
+
+            try {
+                // Create CSV content
+                let csv = 'timestamp,recordingTime,gps_lat,gps_lng,gps_accuracy,gps_timestamp,accel_x,accel_y,accel_z,accel_timestamp,gyro_alpha,gyro_beta,gyro_gamma,gyro_timestamp\n';
+
+                recordedData.forEach(record => {
+                    csv += [
+                        record.timestamp,
+                        record.recordingTime,
+                        record.gps.latitude || '',
+                        record.gps.longitude || '',
+                        record.gps.accuracy || '',
+                        record.gps.timestamp || '',
+                        record.accelerometer.x || '',
+                        record.accelerometer.y || '',
+                        record.accelerometer.z || '',
+                        record.accelerometer.timestamp || '',
+                        record.gyroscope.alpha || '',
+                        record.gyroscope.beta || '',
+                        record.gyroscope.gamma || '',
+                        record.gyroscope.timestamp || ''
+                    ].join(',') + '\n';
+                });
+
+                // Create and trigger download
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `sensor_data_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.csv`;
+                a.style.display = 'none';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+
+                console.log('Data download initiated for', recordedData.length, 'records');
+            } catch (error) {
+                showError('Failed to download data: ' + error.message);
+            }
+        }
+
+        function updateStatus(elementId, status) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.className = 'permission-status ' + status;
+                const statusText = {
+                    'granted': 'Granted',
+                    'denied': 'Denied',
+                    'requesting': 'Requesting...',
+                    'checking': 'Checking...'
+                };
+                element.textContent = statusText[status] || status;
+            }
+        }
+
+        function updateDisplay(elementId, value) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.textContent = value;
+            }
+        }
+
+        function showError(message, autoHide = true) {
+            const errorEl = document.getElementById('errorMessage');
+            const textEl = document.getElementById('errorText');
+            
+            if (errorEl && textEl) {
+                textEl.textContent = message;
+                errorEl.classList.add('show');
+                
+                if (autoHide) {
+                    setTimeout(() => {
+                        hideError();
+                    }, 5000);
+                }
+            }
+        }
+
+        function hideError() {
+            const errorEl = document.getElementById('errorMessage');
+            if (errorEl) {
+                errorEl.classList.remove('show');
+            }
+        }
+
+        // Handle orientation changes
+        window.addEventListener('orientationchange', function() {
+            setTimeout(() => {
+                console.log('Orientation changed, sensors may need recalibration');
+            }, 500);
+        });
+
+        // Handle page visibility changes
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden && isRecording) {
+                console.log('Page hidden while recording - continuing in background');
+            } else if (!document.hidden && isRecording) {
+                console.log('Page visible - recording continues');
+            }
+        });
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', function() {
+            if (gpsWatchId) {
+                navigator.geolocation.clearWatch(gpsWatchId);
+            }
+            if (recordingInterval) {
+                clearInterval(recordingInterval);
+            }
+            if (durationInterval) {
+                clearInterval(durationInterval);
+            }
+        });
+    </script>
+</body>
+</html>
