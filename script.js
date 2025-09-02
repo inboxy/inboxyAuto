@@ -21,9 +21,15 @@ function openDB() {
 
 
 
+// save reading to indexDB
 
 
-
+async function saveReading(reading) {
+  const db = await openDB();
+  const tx = db.transaction(STORE_NAME, 'readwrite');
+  tx.objectStore(STORE_NAME).put(reading);
+  return tx.complete;
+}
 
 
 
