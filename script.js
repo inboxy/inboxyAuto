@@ -1,81 +1,84 @@
-(() => {
-  const startBtn = document.getElementById("startBtn");
-  const stopBtn = document.getElementById("stopBtn");
-  const statusEl = document.getElementById("status");
+// script.js
 
-  let recording = false;
-  let data = [];
-  let geoWatchId = null;
-  let lastMotion = 0;
-  let lastOrientation = 0;
-  const throttleInterval = 100; // ms
+let recording = false;
+let data = [];
 
-  startBtn.addEventListener("click", startRecording);
-  stopBtn.addEventListener("click", stopRecording);
+function startRecording() {
+  if (recording) return;
+  recording = true;
+  data = [];
 
-  function startRecording() {
-    recording = true;
-    data = [];
-    statusEl.textContent = "Recording started";
+  document.getElementById("status").textContent = "Recording...";
 
-    geoWatchId = navigator.geolocation.watchPosition(
-      handleGeolocation,
-      (err) => console.warn("Geolocation error:", err),
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-    );
+  window.addEventListener("devicemotion", handleMotion);
+  window.addEventListener("deviceorientation", handleOrientation);
+  navigator.geolocation.watchPosition(handlePosition, handleError, {
+    enableHighAccuracy: true,
+    maximumAge: 1000,
+    timeout: 5000,
+  });
+}
 
-    window.addEventListener("devicemotion", handleMotion);
-    window.addEventListener("deviceorientation", handleOrientation);
-  }
+function stopRecording() {
+  if (!recording) return;
+  recording = false;
 
-  function stopRecording() {
-    recording = false;
-    statusEl.textContent = "Recording stopped";
+  document.getElementById("status").textContent = "Stopped";
 
-    if (geoWatchId !== null) {
-      navigator.geolocation.clearWatch(geoWatchId);
-    }
+  window.removeEventListener("devicemotion", handleMotion);
+  window.removeEventListener("deviceorientation", handleOrientation);
+  // Geolocation watchPosition can't be removed directly without storing the watch ID
+}
 
-    window.removeEventListener("devicemotion", handleMotion);
-    window.removeEventListener("deviceorientation", handleOrientation);
+function handleMotion(event) {
+  const { acceleration, rotationRate } = event;
+  const timestamp = Date.now();
+  data.push({
+    timestamp,
+    ax: acceleration.x,
+    ay: acceleration.y,
+    az: acceleration.z,
+    alpha: rotationRate.alpha,
+    beta: rotationRate.beta,
+    gamma: rotationRate.gamma,
+  });
+}
 
-    exportCSV(data);
-  }
+function handleOrientation(event) {
+  // Optional: capture orientation data
+}
 
-  function handleGeolocation(position) {
-    if (!recording) return;
-    const { latitude, longitude, accuracy } = position.coords;
-    data.push([Date.now(), "GPS", latitude, longitude, accuracy]);
-  }
+function handlePosition(position) {
+  const { latitude, longitude, altitude, accuracy } = position.coords;
+  const timestamp = position.timestamp;
+  data.push({
+    timestamp,
+    lat: latitude,
+    lon: longitude,
+    alt: altitude,
+    acc: accuracy,
+  });
+}
 
-  function handleMotion(event) {
-    if (!recording || Date.now() - lastMotion < throttleInterval) return;
-    lastMotion = Date.now();
+function handleError(error) {
+  console.error("Geolocation error:", error);
+}
 
-    const acc = event.accelerationIncludingGravity;
-    if (acc) {
-      data.push([Date.now(), "ACC", acc.x, acc.y, acc.z]);
-    }
-  }
+function exportCSV() {
+  if (data.length === 0) return;
 
-  function handleOrientation(event) {
-    if (!recording || Date.now() - lastOrientation < throttleInterval) return;
-    lastOrientation = Date.now();
+  const headers = Object.keys(data[0]);
+  const csv = [
+    headers.join(","),
+    ...data.map(row => headers.map(h => row[h] ?? "").join(","))
+  ].join("\n");
 
-    data.push([Date.now(), "GYRO", event.alpha, event.beta, event.gamma]);
-  }
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
 
-  function exportCSV(rows) {
-    const header = "timestamp,type,x,y,z\n";
-    const content = rows.map(r => r.join(",")).join("\n");
-    const blob = new Blob([header + content], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `sensor_data_${Date.now()}.csv`;
-    link.click();
-
-    URL.revokeObjectURL(url);
-  }
-})();
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `sensor_data_${Date.now()}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
