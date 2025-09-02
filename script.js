@@ -19,11 +19,7 @@ function openDB() {
   });
 }
 
-
-
 // save reading to indexDB
-
-
 async function saveReading(reading) {
   const db = await openDB();
   const tx = db.transaction(STORE_NAME, 'readwrite');
@@ -32,9 +28,26 @@ async function saveReading(reading) {
 }
 
 
+// clean up indexDB
+async function clearReadings() {
+  const db = await openDB();
+  const tx = db.transaction(STORE_NAME, 'readwrite');
+  tx.objectStore(STORE_NAME).clear();
+  return tx.complete;
+}
 
+// get all readings
+async function getAllReadings() {
+  const db = await openDB();
+  const tx = db.transaction(STORE_NAME, 'readonly');
+  const store = tx.objectStore(STORE_NAME);
+  const request = store.getAll();
 
-
+  return new Promise((resolve, reject) => {
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
 
 
 
