@@ -297,7 +297,20 @@
             }
 
             .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+            }
+
+            .stat-card {
+                padding: 15px;
+            }
+
+            .stat-value {
+                font-size: 1.5em;
+            }
+
+            .stat-label {
+                font-size: 0.8em;
             }
 
             .controls {
@@ -367,9 +380,8 @@
         </div>
 
         <div class="controls">
-            <button class="btn btn-primary" id="startBtn" onclick="startRecording()">Start Recording</button>
-            <button class="btn btn-secondary" id="stopBtn" onclick="stopRecording()" disabled>Stop Recording</button>
-            <button class="btn btn-success" id="downloadBtn" onclick="downloadData()" disabled>Download Data</button>
+            <button class="btn btn-primary" id="startBtn">Start Recording</button>
+            <button class="btn btn-secondary" id="stopBtn" disabled>Stop Recording</button>
         </div>
 
         <div class="sensor-data">
@@ -495,13 +507,27 @@
         document.addEventListener('DOMContentLoaded', function() {
             initializeUserId();
             initializeApp();
+            setupButtonListeners();
         });
+
+        function setupButtonListeners() {
+            const startBtn = document.getElementById('startBtn');
+            const stopBtn = document.getElementById('stopBtn');
+            
+            if (startBtn) {
+                startBtn.addEventListener('click', startRecording);
+            }
+            
+            if (stopBtn) {
+                stopBtn.addEventListener('click', stopRecording);
+            }
+        }
 
         async function initializeApp() {
             try {
                 showError('Checking sensor permissions...', false);
                 await checkPermissions();
-                setupEventListeners();
+                setupSensorEventListeners();
                 hideError();
             } catch (error) {
                 showError('Failed to initialize sensors: ' + error.message);
@@ -581,7 +607,7 @@
             }
         }
 
-        function setupEventListeners() {
+        function setupSensorEventListeners() {
             // GPS tracking
             if (hasGPS) {
                 const options = {
@@ -674,11 +700,10 @@
             // Update UI
             document.getElementById('startBtn').disabled = true;
             document.getElementById('stopBtn').disabled = false;
-            document.getElementById('downloadBtn').disabled = true;
             document.getElementById('recordingStatus').textContent = 'Recording';
             document.getElementById('recordingIndicator').classList.add('active');
 
-            // Start recording interval (10Hz = 100ms intervals)
+            // Start recording interval (approximately 144Hz = 7ms intervals)
             recordingInterval = setInterval(recordDataPoint, 7);
 
             // Start duration timer
@@ -690,7 +715,7 @@
                 }
                 updateDuration();
                 updateFrequency();
-            }, 7);
+            }, 100);
 
             hideError();
             console.log('Recording started');
@@ -715,11 +740,22 @@
             // Update UI
             document.getElementById('startBtn').disabled = false;
             document.getElementById('stopBtn').disabled = true;
-            document.getElementById('downloadBtn').disabled = recordedData.length === 0;
             document.getElementById('recordingStatus').textContent = 'Stopped';
             document.getElementById('recordingIndicator').classList.remove('active');
 
             console.log('Recording stopped. Total records:', recordedData.length);
+
+            // Automatically download the CSV file
+            if (recordedData.length > 0) {
+                try {
+                    downloadData();
+                } catch (error) {
+                    console.error('Error during download:', error);
+                    showError('Recording stopped but download failed: ' + error.message);
+                }
+            } else {
+                showError('No data was recorded. Please ensure sensors are working and try again.');
+            }
         }
 
         function recordDataPoint() {
@@ -806,8 +842,11 @@
                 window.URL.revokeObjectURL(url);
 
                 console.log('Data download initiated for', recordedData.length, 'records');
+                showError('Download completed successfully! 📁', true);
             } catch (error) {
+                console.error('Download error:', error);
                 showError('Failed to download data: ' + error.message);
+                throw error; // Re-throw to be caught by stopRecording
             }
         }
 
