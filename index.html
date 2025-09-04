@@ -10,7 +10,7 @@
 
     <link rel="manifest" href="manifest.json">
     
-       <title>Sensor Data Recorder</title>
+    <title>Sensor Data Recorder</title>
     <style>
         * {
             margin: 0;
@@ -211,70 +211,83 @@
         .permission-status {
             display: inline-block;
             padding: 5px 10px;
-            border-radius: 15px;
+            border-radius: 0;
             font-size: 0.8em;
             font-weight: bold;
             text-transform: uppercase;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 1px;
+            border: 1px solid;
         }
 
         .granted {
-            background: #2ed573;
-            color: white;
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+            border-color: #00ff88;
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+            text-shadow: 0 0 5px #00ff88;
         }
 
         .denied {
-            background: #ff4757;
-            color: white;
+            background: rgba(255, 0, 0, 0.2);
+            color: #ff0000;
+            border-color: #ff0000;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
+            text-shadow: 0 0 5px #ff0000;
         }
 
         .requesting {
-            background: #ffa502;
-            color: white;
+            background: rgba(255, 255, 0, 0.2);
+            color: #ffff00;
+            border-color: #ffff00;
+            box-shadow: 0 0 10px rgba(255, 255, 0, 0.3);
+            text-shadow: 0 0 5px #ffff00;
+            animation: requestingBlink 1s infinite;
+        }
+
+        @keyframes requestingBlink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
 
         .error-message {
-            background: #ff4757;
-            color: white;
+            background: rgba(255, 0, 0, 0.2);
+            border: 1px solid #ff0000;
+            color: #ff0000;
             padding: 15px;
-            border-radius: 10px;
+            border-radius: 0;
             margin-bottom: 20px;
             text-align: center;
             display: none;
+            font-family: 'Courier New', monospace;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+            text-shadow: 0 0 10px #ff0000;
         }
 
         .error-message.show {
             display: block;
+            animation: errorFlash 0.5s ease-in-out;
         }
 
-        .install-section {
+        @keyframes errorFlash {
+            0% { opacity: 0; transform: scale(0.95); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .user-info {
             text-align: center;
             margin-bottom: 20px;
             padding: 15px;
-            background: rgba(102, 126, 234, 0.1);
-            border-radius: 15px;
-            border: 2px dashed #667eea;
-        }
-
-        .install-section.hidden {
-            display: none;
-        }
-
-        .btn-install {
-            background: linear-gradient(135deg, #2ed573 0%, #17a2b8 100%);
-            color: white;
-            margin-top: 10px;
-        }
-
-        .btn-install:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(46, 213, 115, 0.3);
-        }
-
-        .install-text {
-            font-size: 0.9em;
-            color: #667eea;
-            margin-bottom: 10px;
-            font-weight: 500;
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid #00ffff;
+            border-radius: 0;
+            color: #00ffff;
+            font-family: 'Courier New', monospace;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
         }
 
         @media (max-width: 768px) {
@@ -295,139 +308,6 @@
                 width: 100%;
             }
         }
-
-        // PWA Setup and Installation
-        function setupPWA() {
-            // Register service worker
-            if ('serviceWorker' in navigator) {
-                const swCode = `
-                    const CACHE_NAME = 'sensor-recorder-v1';
-                    const urlsToCache = ['/'];
-                    
-                    self.addEventListener('install', event => {
-                        event.waitUntil(
-                            caches.open(CACHE_NAME)
-                                .then(cache => cache.addAll(urlsToCache))
-                        );
-                    });
-                    
-                    self.addEventListener('fetch', event => {
-                        event.respondWith(
-                            caches.match(event.request)
-                                .then(response => {
-                                    if (response) {
-                                        return response;
-                                    }
-                                    return fetch(event.request);
-                                })
-                        );
-                    });
-                `;
-                
-
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js')
-    .then(reg => console.log('Service Worker registered:', reg))
-    .catch(err => console.error('Service Worker registration failed:', err));
-}
-
-            // Handle beforeinstallprompt event
-            window.addEventListener('beforeinstallprompt', (e) => {
-                console.log('beforeinstallprompt event fired');
-                e.preventDefault();
-                deferredPrompt = e;
-                isInstallable = true;
-                showInstallOption();
-            });
-
-            // Handle app installed event
-            window.addEventListener('appinstalled', (evt) => {
-                console.log('App installed successfully');
-                hideInstallOption();
-                showError('App installed successfully! 🎉', true);
-            });
-
-            // Check if already installed (standalone mode)
-            if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
-                console.log('App is running in standalone mode');
-                hideInstallOption();
-            }
-
-            // For iOS Safari - show install instructions
-            if (isIOSSafari()) {
-                showIOSInstallInstructions();
-            }
-        }
-
-        function isIOSSafari() {
-            const userAgent = window.navigator.userAgent.toLowerCase();
-            const isIOS = /ipad|iphone|ipod/.test(userAgent);
-            const isSafari = /safari/.test(userAgent) && !/chrome|crios|fxios/.test(userAgent);
-            return isIOS && isSafari;
-        }
-
-        function showInstallOption() {
-            const installSection = document.getElementById('installSection');
-            if (installSection) {
-                installSection.classList.remove('hidden');
-            }
-        }
-
-        function hideInstallOption() {
-            const installSection = document.getElementById('installSection');
-            if (installSection) {
-                installSection.classList.add('hidden');
-            }
-        }
-
-        function showIOSInstallInstructions() {
-            const installSection = document.getElementById('installSection');
-            const installText = installSection.querySelector('.install-text');
-            const installBtn = document.getElementById('installBtn');
-            
-            if (installText && installBtn) {
-                installText.innerHTML = '📱 To install: Tap <strong>Share</strong> → <strong>Add to Home Screen</strong>';
-                installBtn.style.display = 'none';
-                installSection.classList.remove('hidden');
-            }
-        }
-
-        async function installApp() {
-            if (!deferredPrompt) {
-                // Fallback for browsers that don't support PWA installation
-                if (isIOSSafari()) {
-                    showError('Tap the Share button and select "Add to Home Screen"', true);
-                } else {
-                    showError('Installation not available in this browser', true);
-                }
-                return;
-            }
-
-            try {
-                // Show the installation prompt
-                deferredPrompt.prompt();
-                
-                // Wait for the user to respond
-                const { outcome } = await deferredPrompt.userChoice;
-                
-                console.log('User choice:', outcome);
-                
-                if (outcome === 'accepted') {
-                    console.log('User accepted the install prompt');
-                    showError('Installing app... 📱', true);
-                } else {
-                    console.log('User dismissed the install prompt');
-                }
-                
-                // Clear the saved prompt
-                deferredPrompt = null;
-                isInstallable = false;
-                hideInstallOption();
-                
-            } catch (error) {
-                console.error('Installation failed:', error);
-                showError('Installation failed. Please try again.', true);
-            }
     </style>
 </head>
 <body>
@@ -441,13 +321,12 @@ if ('serviceWorker' in navigator) {
             <p>Advanced GPS, Accelerometer & Gyroscope Data Logger</p>
         </div>
 
-        <div id="errorMessage" class="error-message">
-            <span id="errorText"></span>
+        <div class="user-info">
+            <strong>User ID:</strong> <span id="userIdDisplay">--</span>
         </div>
 
-        <div id="installSection" class="install-section hidden">
-            <div class="install-text">📱 Save this app to your home screen for easy access!</div>
-            <button class="btn btn-install" id="installBtn" onclick="installApp()">Add to Home Screen</button>
+        <div id="errorMessage" class="error-message">
+            <span id="errorText"></span>
         </div>
 
         <div class="stats-grid">
@@ -556,11 +435,6 @@ if ('serviceWorker' in navigator) {
         </div>
     </div>
 
-<script src="script.js"></script>
-
-    <!--
-
-    -->
     <script>
         let isRecording = false;
         let recordedData = [];
@@ -571,10 +445,7 @@ if ('serviceWorker' in navigator) {
         let hasGPS = false;
         let hasMotion = false;
         let hasGyro = false;
-
-        // PWA installation variables
-        let deferredPrompt;
-        let isInstallable = false;
+        let userId = null;
 
         // Current sensor values
         let currentData = {
@@ -583,10 +454,47 @@ if ('serviceWorker' in navigator) {
             gyroscope: { alpha: null, beta: null, gamma: null, timestamp: null }
         };
 
+        // Cookie management functions
+        function setCookie(name, value, days = 365) {
+            const expires = new Date();
+            expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
+            document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
+        }
+
+        function getCookie(name) {
+            const nameEQ = name + "=";
+            const ca = document.cookie.split(';');
+            for(let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+                if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+            }
+            return null;
+        }
+
+        function generateUserId() {
+            return 'user_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now().toString(36);
+        }
+
+        function initializeUserId() {
+            userId = getCookie('sensorUserId');
+            if (!userId) {
+                userId = generateUserId();
+                setCookie('sensorUserId', userId);
+            }
+            updateDisplay('userIdDisplay', userId);
+        }
+
+        function generateFilename() {
+            const now = new Date();
+            const dateStr = now.toISOString().slice(0, 19).replace(/:/g, '-');
+            return `sensor_data_${userId}_${dateStr}.csv`;
+        }
+
         // Initialize the app
         document.addEventListener('DOMContentLoaded', function() {
+            initializeUserId();
             initializeApp();
-            setupPWA();
         });
 
         async function initializeApp() {
@@ -614,7 +522,7 @@ if ('serviceWorker' in navigator) {
                             (error) => {
                                 updateStatus('gpsStatus', 'denied');
                                 console.warn('GPS access denied:', error.message);
-                                resolve(); // Don't reject, just continue without GPS
+                                resolve();
                             },
                             { timeout: 10000, maximumAge: 60000 }
                         );
@@ -629,7 +537,6 @@ if ('serviceWorker' in navigator) {
             // Check Motion (Accelerometer)
             if ('DeviceMotionEvent' in window) {
                 if (typeof DeviceMotionEvent.requestPermission === 'function') {
-                    // iOS 13+ permission request
                     try {
                         const permission = await DeviceMotionEvent.requestPermission();
                         if (permission === 'granted') {
@@ -643,7 +550,6 @@ if ('serviceWorker' in navigator) {
                         console.warn('Motion permission error:', error);
                     }
                 } else {
-                    // Non-iOS or older iOS
                     hasMotion = true;
                     updateStatus('motionStatus', 'granted');
                 }
@@ -654,7 +560,6 @@ if ('serviceWorker' in navigator) {
             // Check Gyroscope (DeviceOrientationEvent)
             if ('DeviceOrientationEvent' in window) {
                 if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-                    // iOS 13+ permission request
                     try {
                         const permission = await DeviceOrientationEvent.requestPermission();
                         if (permission === 'granted') {
@@ -668,7 +573,6 @@ if ('serviceWorker' in navigator) {
                         console.warn('Gyroscope permission error:', error);
                     }
                 } else {
-                    // Non-iOS or older iOS
                     hasGyro = true;
                     updateStatus('gyroStatus', 'granted');
                 }
@@ -721,7 +625,6 @@ if ('serviceWorker' in navigator) {
 
         function handleGPSError(error) {
             console.warn('GPS Error:', error.message);
-            // Don't show error for every GPS failure, just log it
         }
 
         function handleMotionUpdate(event) {
@@ -744,9 +647,9 @@ if ('serviceWorker' in navigator) {
         function handleOrientationUpdate(event) {
             const now = new Date();
             currentData.gyroscope = {
-                alpha: event.alpha || 0,  // Z-axis rotation (0-360°)
-                beta: event.beta || 0,    // X-axis rotation (-180 to 180°)
-                gamma: event.gamma || 0,  // Y-axis rotation (-90 to 90°)
+                alpha: event.alpha || 0,
+                beta: event.beta || 0,
+                gamma: event.gamma || 0,
                 timestamp: now.toISOString()
             };
 
@@ -826,6 +729,7 @@ if ('serviceWorker' in navigator) {
             const dataPoint = {
                 timestamp: now.toISOString(),
                 recordingTime: Date.now() - recordingStartTime,
+                userId: userId,
                 gps: { ...currentData.gps },
                 accelerometer: { ...currentData.accelerometer },
                 gyroscope: { ...currentData.gyroscope }
@@ -866,13 +770,14 @@ if ('serviceWorker' in navigator) {
             }
 
             try {
-                // Create CSV content
-                let csv = 'timestamp,recordingTime,gps_lat,gps_lng,gps_accuracy,gps_timestamp,accel_x,accel_y,accel_z,accel_timestamp,gyro_alpha,gyro_beta,gyro_gamma,gyro_timestamp\n';
+                // Create CSV content with user ID column
+                let csv = 'timestamp,recordingTime,userId,gps_lat,gps_lng,gps_accuracy,gps_timestamp,accel_x,accel_y,accel_z,accel_timestamp,gyro_alpha,gyro_beta,gyro_gamma,gyro_timestamp\n';
 
                 recordedData.forEach(record => {
                     csv += [
                         record.timestamp,
                         record.recordingTime,
+                        record.userId,
                         record.gps.latitude || '',
                         record.gps.longitude || '',
                         record.gps.accuracy || '',
@@ -888,12 +793,12 @@ if ('serviceWorker' in navigator) {
                     ].join(',') + '\n';
                 });
 
-                // Create and trigger download
+                // Create and trigger download with cookie-based filename
                 const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `sensor_data_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.csv`;
+                a.download = generateFilename();
                 a.style.display = 'none';
                 document.body.appendChild(a);
                 a.click();
@@ -979,9 +884,5 @@ if ('serviceWorker' in navigator) {
             }
         });
     </script>
-   
-    <!--
-    
-    -->
 </body>
 </html>
